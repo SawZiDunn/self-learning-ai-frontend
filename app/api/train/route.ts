@@ -17,7 +17,9 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            throw new Error(`Backend responded with status: ${response.status}`);
+            throw new Error(
+                `Backend responded with status: ${response.status}`
+            );
         }
 
         const data = await response.json();

@@ -96,9 +96,7 @@ export default function ChatInterface() {
 
         // Update UI immediately
         setMessages((prev) =>
-            prev.map((msg, i) =>
-                i === index ? { ...msg, feedback } : msg
-            )
+            prev.map((msg, i) => (i === index ? { ...msg, feedback } : msg))
         );
 
         // If bad feedback, trigger AI improvement

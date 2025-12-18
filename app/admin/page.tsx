@@ -19,9 +19,9 @@ import {
 import Link from "next/link";
 
 export default function AdminPanel() {
-    const [activeTab, setActiveTab] = useState<
-        "prompt" | "history" | "train"
-    >("prompt");
+    const [activeTab, setActiveTab] = useState<"prompt" | "history" | "train">(
+        "prompt"
+    );
     const [currentPrompt, setCurrentPrompt] = useState("");
     const [instructions, setInstructions] = useState("");
     const [promptHistory, setPromptHistory] = useState<any[]>([]);
@@ -239,7 +239,8 @@ export default function AdminPanel() {
                                     >
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Version {entry.version || index + 1}
+                                                Version{" "}
+                                                {entry.version || index + 1}
                                             </span>
                                             <span className="text-xs text-gray-500 dark:text-gray-400">
                                                 {entry.timestamp
