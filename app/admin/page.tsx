@@ -197,7 +197,7 @@ export default function AdminPanel() {
                             Manual Improvement
                         </h3>
                         <p className="text-gray-600 dark:text-gray-400 mb-4">
-                            Provide instructions to improve the AI's behavior
+                            Provide instructions to improve the AI&apos;s behavior
                         </p>
                         <textarea
                             value={instructions}
