@@ -1,11 +1,8 @@
 import axios from "axios";
 
-const API_URL =
-    process.env.NEXT_PUBLIC_API_URL ||
-    "https://web-production-ca44a.up.railway.app";
-
+// Use Next.js API route to avoid CORS issues
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: "/api",
     headers: {
         "Content-Type": "application/json",
     },
@@ -21,14 +18,16 @@ export async function sendMessage(
     chatHistory: ChatMessage[] = []
 ) {
     try {
-        const response = await api.post("/generate-reply", {
+        const response = await api.post("/chat", {
             clientSequence: message,
             chatHistory: chatHistory,
         });
 
         return response.data.aiReply;
-    } catch (error) {
+    } catch (error: any) {
         console.error("API Error:", error);
+        console.error("Error response:", error.response?.data);
+        console.error("Error status:", error.response?.status);
         throw new Error("Failed to get response from AI");
     }
 }
