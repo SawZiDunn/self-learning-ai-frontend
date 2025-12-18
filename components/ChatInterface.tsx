@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Bot, User } from "lucide-react";
-import { sendMessage } from "@/lib/api";
+import { Send, Loader2, Bot, User, ThumbsUp, ThumbsDown } from "lucide-react";
+import { sendMessage, improveAI } from "@/lib/api";
 
 interface Message {
     role: "user" | "assistant";
     content: string;
     timestamp: Date;
+    feedback?: "good" | "bad" | null;
+    userMessage?: string;
+    chatHistoryAtTime?: any[];
 }
 
 export default function ChatInterface() {
@@ -57,6 +60,9 @@ export default function ChatInterface() {
                 role: "assistant",
                 content: response,
                 timestamp: new Date(),
+                feedback: null,
+                userMessage: input.trim(),
+                chatHistoryAtTime: chatHistory,
             };
 
             setMessages((prev) => [...prev, assistantMessage]);
@@ -77,6 +83,36 @@ export default function ChatInterface() {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             handleSend();
+        }
+    };
+
+    const handleFeedback = async (
+        index: number,
+        feedback: "good" | "bad",
+        betterReply?: string
+    ) => {
+        const message = messages[index];
+        if (message.role !== "assistant") return;
+
+        // Update UI immediately
+        setMessages((prev) =>
+            prev.map((msg, i) =>
+                i === index ? { ...msg, feedback } : msg
+            )
+        );
+
+        // If bad feedback, trigger AI improvement
+        if (feedback === "bad" && betterReply && message.userMessage) {
+            try {
+                await improveAI(
+                    message.userMessage,
+                    message.chatHistoryAtTime || [],
+                    betterReply
+                );
+                console.log("AI improved based on feedback");
+            } catch (error) {
+                console.error("Failed to improve AI:", error);
+            }
         }
     };
 
@@ -120,12 +156,53 @@ export default function ChatInterface() {
                                     {message.content}
                                 </p>
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 px-2">
-                                {message.timestamp.toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                })}
-                            </p>
+                            <div className="flex items-center gap-2 mt-1 px-2">
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {message.timestamp.toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
+                                </p>
+                                {message.role === "assistant" && (
+                                    <div className="flex gap-1 ml-2">
+                                        <button
+                                            onClick={() =>
+                                                handleFeedback(index, "good")
+                                            }
+                                            className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+                                                message.feedback === "good"
+                                                    ? "text-green-600"
+                                                    : "text-gray-400"
+                                            }`}
+                                            title="Good response"
+                                        >
+                                            <ThumbsUp className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                const betterReply = prompt(
+                                                    "What would be a better response?"
+                                                );
+                                                if (betterReply) {
+                                                    handleFeedback(
+                                                        index,
+                                                        "bad",
+                                                        betterReply
+                                                    );
+                                                }
+                                            }}
+                                            className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${
+                                                message.feedback === "bad"
+                                                    ? "text-red-600"
+                                                    : "text-gray-400"
+                                            }`}
+                                            title="Bad response - provide better one"
+                                        >
+                                            <ThumbsDown className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}

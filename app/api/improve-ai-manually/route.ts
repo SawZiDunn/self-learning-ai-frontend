@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL =
     process.env.NEXT_PUBLIC_API_URL ||
-    "https://sawzidunn-hackathon.up.railway.app";
+    "https://web-production-ca44a.up.railway.app";
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
 
-        const response = await fetch(`${BACKEND_URL}/generate-reply`, {
+        const response = await fetch(`${BACKEND_URL}/improve-ai-manually`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -17,9 +17,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            throw new Error(
-                `Backend responded with status: ${response.status}`
-            );
+            throw new Error(`Backend responded with status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -27,7 +25,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error("Proxy error:", error);
         return NextResponse.json(
-            { error: "Failed to communicate with backend" },
+            { error: "Failed to manually improve AI" },
             { status: 500 }
         );
     }

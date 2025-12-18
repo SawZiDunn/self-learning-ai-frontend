@@ -32,12 +32,62 @@ export async function sendMessage(
     }
 }
 
-export async function checkHealth() {
+export async function getPrompt() {
     try {
-        const response = await api.get("/health");
+        const response = await api.get("/prompt");
         return response.data;
-    } catch (error) {
-        console.error("Health check failed:", error);
-        return null;
+    } catch (error: any) {
+        console.error("Get prompt error:", error);
+        throw new Error("Failed to get prompt");
+    }
+}
+
+export async function getPromptHistory() {
+    try {
+        const response = await api.get("/prompt-history");
+        return response.data;
+    } catch (error: any) {
+        console.error("Get prompt history error:", error);
+        throw new Error("Failed to get prompt history");
+    }
+}
+
+export async function improveAI(
+    clientSequence: string,
+    chatHistory: ChatMessage[],
+    consultantReply: string
+) {
+    try {
+        const response = await api.post("/improve-ai", {
+            clientSequence,
+            chatHistory,
+            consultantReply,
+        });
+        return response.data;
+    } catch (error: any) {
+        console.error("Improve AI error:", error);
+        throw new Error("Failed to improve AI");
+    }
+}
+
+export async function improveAIManually(instructions: string) {
+    try {
+        const response = await api.post("/improve-ai-manually", {
+            instructions,
+        });
+        return response.data;
+    } catch (error: any) {
+        console.error("Manual improve error:", error);
+        throw new Error("Failed to manually improve AI");
+    }
+}
+
+export async function trainAI(conversationData: any) {
+    try {
+        const response = await api.post("/train", conversationData);
+        return response.data;
+    } catch (error: any) {
+        console.error("Train AI error:", error);
+        throw new Error("Failed to train AI");
     }
 }
